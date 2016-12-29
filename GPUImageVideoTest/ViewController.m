@@ -413,7 +413,7 @@
     
     _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(480.0, 640.0)];
     _movieWriter.encodingLiveVideo = YES;
-    [self.blendFilter addTarget:_movieWriter];
+    [self.filter addTarget:_movieWriter];
     _videoCamera.audioEncodingTarget = _movieWriter;
     [_movieWriter startRecording];
     
@@ -425,7 +425,7 @@
     longG.view.backgroundColor = [UIColor redColor];
 //    [_videoCamera removeAudioInputsAndOutputs];
 
-    [self.blendFilter removeTarget:_movieWriter];
+    [self.filter removeTarget:_movieWriter];
     _videoCamera.audioEncodingTarget = nil;
     [_movieWriter finishRecording];
     
