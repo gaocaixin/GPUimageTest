@@ -284,15 +284,13 @@
 - (CGFloat)rotateFromDict:(NSDictionary *)facePointDict
 {
     CGPoint left_eye_left_corner = CGPointFromString(facePointDict[@"left_eye_left_corner"]);
-    CGPoint left_eye_right_corner= CGPointFromString(facePointDict[@"right_eye_right_corner"]);
-    CGPoint nose_top = CGPointFromString(facePointDict[@"nose_top"]);
-    CGPoint eyeCenter = CGPointMake((left_eye_left_corner.x + left_eye_right_corner.x) / 2., (left_eye_left_corner.y + left_eye_right_corner.y) / 2.);
-    CGFloat y2 = eyeCenter.y;
-    CGFloat x2 = eyeCenter.x;
-    CGFloat y1 = nose_top.y;
-    CGFloat x1 = nose_top.x;
+    CGPoint right_eye_right_corner= CGPointFromString(facePointDict[@"right_eye_right_corner"]);
+//    CGPoint nose_top = CGPointFromString(facePointDict[@"nose_top"]);
+//    CGPoint eyeCenter = CGPointMake((left_eye_left_corner.x + right_eye_right_corner.x) / 2., (left_eye_left_corner.y + right_eye_right_corner.y) / 2.);
+    CGPoint point0 = left_eye_left_corner;
+    CGPoint point1 = right_eye_right_corner;
 
-    CGFloat rotate = atan((y2-y1)/(x2-x1));
+    CGFloat rotate = atan2( point0.y-point1.y, point0.x-point1.x );
     return rotate;
 }
 - (UIImageView *)imageViewFromSet
