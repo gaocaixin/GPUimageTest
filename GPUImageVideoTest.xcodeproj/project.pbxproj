@@ -69,6 +69,18 @@
 		33DFA27E1E14C1A5008B7919 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33DFA27D1E14C1A5008B7919 /* Foundation.framework */; };
 		33DFA2801E14C210008B7919 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 33DFA27F1E14C210008B7919 /* libc++.tbd */; };
 		33DFA2821E14C21B008B7919 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 33DFA2811E14C21B008B7919 /* libz.tbd */; };
+		33E0390C1E15FC3200085881 /* GXImageFaceInfoMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 33E0390B1E15FC3200085881 /* GXImageFaceInfoMode.m */; };
+		33E0390E1E16122100085881 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E0390D1E16122100085881 /* GLKit.framework */; };
+		33E0391C1E1642A600085881 /* eye_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E039111E1642A600085881 /* eye_1.png */; };
+		33E0391D1E1642A600085881 /* eye_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E039121E1642A600085881 /* eye_2.png */; };
+		33E0391E1E1642A600085881 /* eye_3.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E039131E1642A600085881 /* eye_3.png */; };
+		33E0391F1E1642A600085881 /* eye_4.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E039141E1642A600085881 /* eye_4.png */; };
+		33E039201E1642A600085881 /* eye_5.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E039151E1642A600085881 /* eye_5.png */; };
+		33E039211E1642A600085881 /* mon_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E039171E1642A600085881 /* mon_1.png */; };
+		33E039221E1642A600085881 /* mon_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E039181E1642A600085881 /* mon_2.png */; };
+		33E039231E1642A600085881 /* mon_3.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E039191E1642A600085881 /* mon_3.png */; };
+		33E039241E1642A600085881 /* mon_4.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E0391A1E1642A600085881 /* mon_4.png */; };
+		33E039251E1642A600085881 /* mon_5.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E0391B1E1642A600085881 /* mon_5.png */; };
 		33E28D781E1110C300DA322F /* GPUImageBeautifyFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 33E28D771E1110C300DA322F /* GPUImageBeautifyFilter.m */; };
 		33FCBEA01E1109C800A50207 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 33FCBE9F1E1109C800A50207 /* main.m */; };
 		33FCBEA31E1109C800A50207 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 33FCBEA21E1109C800A50207 /* AppDelegate.m */; };
@@ -209,6 +221,19 @@
 		33DFA27D1E14C1A5008B7919 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		33DFA27F1E14C210008B7919 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		33DFA2811E14C21B008B7919 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		33E0390A1E15FC3200085881 /* GXImageFaceInfoMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GXImageFaceInfoMode.h; sourceTree = "<group>"; };
+		33E0390B1E15FC3200085881 /* GXImageFaceInfoMode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GXImageFaceInfoMode.m; sourceTree = "<group>"; };
+		33E0390D1E16122100085881 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		33E039111E1642A600085881 /* eye_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eye_1.png; sourceTree = "<group>"; };
+		33E039121E1642A600085881 /* eye_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eye_2.png; sourceTree = "<group>"; };
+		33E039131E1642A600085881 /* eye_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eye_3.png; sourceTree = "<group>"; };
+		33E039141E1642A600085881 /* eye_4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eye_4.png; sourceTree = "<group>"; };
+		33E039151E1642A600085881 /* eye_5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eye_5.png; sourceTree = "<group>"; };
+		33E039171E1642A600085881 /* mon_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mon_1.png; sourceTree = "<group>"; };
+		33E039181E1642A600085881 /* mon_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mon_2.png; sourceTree = "<group>"; };
+		33E039191E1642A600085881 /* mon_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mon_3.png; sourceTree = "<group>"; };
+		33E0391A1E1642A600085881 /* mon_4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mon_4.png; sourceTree = "<group>"; };
+		33E0391B1E1642A600085881 /* mon_5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mon_5.png; sourceTree = "<group>"; };
 		33E28D761E1110C300DA322F /* GPUImageBeautifyFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUImageBeautifyFilter.h; sourceTree = "<group>"; };
 		33E28D771E1110C300DA322F /* GPUImageBeautifyFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageBeautifyFilter.m; sourceTree = "<group>"; };
 		33FCBE9B1E1109C800A50207 /* GPUImageVideoTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GPUImageVideoTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -237,6 +262,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33E0390E1E16122100085881 /* GLKit.framework in Frameworks */,
 				33DFA2821E14C21B008B7919 /* libz.tbd in Frameworks */,
 				33DFA2801E14C210008B7919 /* libc++.tbd in Frameworks */,
 				33DFA27E1E14C1A5008B7919 /* Foundation.framework in Frameworks */,
@@ -428,6 +454,39 @@
 			path = Result;
 			sourceTree = "<group>";
 		};
+		33E0390F1E1642A600085881 /* animation */ = {
+			isa = PBXGroup;
+			children = (
+				33E039101E1642A600085881 /* eye */,
+				33E039161E1642A600085881 /* mon */,
+			);
+			path = animation;
+			sourceTree = "<group>";
+		};
+		33E039101E1642A600085881 /* eye */ = {
+			isa = PBXGroup;
+			children = (
+				33E039111E1642A600085881 /* eye_1.png */,
+				33E039121E1642A600085881 /* eye_2.png */,
+				33E039131E1642A600085881 /* eye_3.png */,
+				33E039141E1642A600085881 /* eye_4.png */,
+				33E039151E1642A600085881 /* eye_5.png */,
+			);
+			path = eye;
+			sourceTree = "<group>";
+		};
+		33E039161E1642A600085881 /* mon */ = {
+			isa = PBXGroup;
+			children = (
+				33E039171E1642A600085881 /* mon_1.png */,
+				33E039181E1642A600085881 /* mon_2.png */,
+				33E039191E1642A600085881 /* mon_3.png */,
+				33E0391A1E1642A600085881 /* mon_4.png */,
+				33E0391B1E1642A600085881 /* mon_5.png */,
+			);
+			path = mon;
+			sourceTree = "<group>";
+		};
 		33E28D751E1110C300DA322F /* GPUImageBeautifyFilter */ = {
 			isa = PBXGroup;
 			children = (
@@ -439,6 +498,8 @@
 				330333361E13766F0059CE6E /* TencentBeautyFilter.m */,
 				330333381E138E5D0059CE6E /* LFGPUImageEmptyFilter.h */,
 				330333391E138E5D0059CE6E /* LFGPUImageEmptyFilter.m */,
+				33E0390A1E15FC3200085881 /* GXImageFaceInfoMode.h */,
+				33E0390B1E15FC3200085881 /* GXImageFaceInfoMode.m */,
 			);
 			path = GPUImageBeautifyFilter;
 			sourceTree = "<group>";
@@ -474,6 +535,7 @@
 				33E28D751E1110C300DA322F /* GPUImageBeautifyFilter */,
 				33FCBEA11E1109C800A50207 /* AppDelegate.h */,
 				33FCBEA21E1109C800A50207 /* AppDelegate.m */,
+				33E0390F1E1642A600085881 /* animation */,
 				33FCBEA41E1109C800A50207 /* ViewController.h */,
 				33FCBEA51E1109C800A50207 /* ViewController.m */,
 				33D477A21E123D5200C18A99 /* MovieViewController.h */,
@@ -518,6 +580,7 @@
 		3741BEB37C15F90821D80A7A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				33E0390D1E16122100085881 /* GLKit.framework */,
 				33DFA2811E14C21B008B7919 /* libz.tbd */,
 				33DFA27F1E14C210008B7919 /* libc++.tbd */,
 				33DFA27D1E14C1A5008B7919 /* Foundation.framework */,
@@ -650,10 +713,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33E039221E1642A600085881 /* mon_2.png in Resources */,
+				33E0391D1E1642A600085881 /* eye_2.png in Resources */,
 				33FCBEAE1E1109C800A50207 /* LaunchScreen.storyboard in Resources */,
+				33E039241E1642A600085881 /* mon_4.png in Resources */,
+				33E039231E1642A600085881 /* mon_3.png in Resources */,
 				33D477451E1234F400C18A99 /* tumblr_ngukgdu1FA1s7ldogo1_500.gif in Resources */,
 				33FCBEAB1E1109C800A50207 /* Assets.xcassets in Resources */,
+				33E0391F1E1642A600085881 /* eye_4.png in Resources */,
 				33FCBEA91E1109C800A50207 /* Main.storyboard in Resources */,
+				33E039201E1642A600085881 /* eye_5.png in Resources */,
+				33E0391E1E1642A600085881 /* eye_3.png in Resources */,
+				33E039251E1642A600085881 /* mon_5.png in Resources */,
+				33E0391C1E1642A600085881 /* eye_1.png in Resources */,
+				33E039211E1642A600085881 /* mon_1.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -740,6 +813,7 @@
 				33D477981E123C7C00C18A99 /* UIDevice+GXDevelop.m in Sources */,
 				33DFA25E1E14BF61008B7919 /* UIImage+Extensions.m in Sources */,
 				33D477A01E123C7C00C18A99 /* UIView+GXDevelopAnimation.m in Sources */,
+				33E0390C1E15FC3200085881 /* GXImageFaceInfoMode.m in Sources */,
 				33FCBEA61E1109C800A50207 /* ViewController.m in Sources */,
 				33E28D781E1110C300DA322F /* GPUImageBeautifyFilter.m in Sources */,
 				33DFA25B1E14BF61008B7919 /* CalculatorTools.m in Sources */,

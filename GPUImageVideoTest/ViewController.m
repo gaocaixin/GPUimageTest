@@ -32,6 +32,7 @@
 #import "UIImage+Extensions.h"
 #import "IFlyFaceImage.h"
 #import "IFlyFaceResultKeys.h"
+#import "LFGPUImageEmptyFilter.h"
 
 #define useFilter 1
 #define useFace 1
@@ -40,6 +41,8 @@
 
 @property(strong, nonatomic) GPUImageVideoCamera *videoCamera;
 @property(strong, nonatomic) GPUImageFilter *filter;
+@property(strong, nonatomic) LFGPUImageEmptyFilter *Emptyfilter;
+
 @property(strong, nonatomic) GPUImageView *filterView;
 @property(strong, nonatomic) GPUImageUIElement *uiElementInput;
 @property(strong, nonatomic) CIDetector *faceDetector;
@@ -64,6 +67,9 @@
 
 @property (nonatomic) UIInterfaceOrientation interfaceOrientation;
 @property (strong,nonatomic) CMMotionManager *motionManager;
+
+@property (nonatomic, weak)NSArray  *faceInfos; // 人脸信息集 每个人脸的 rect 和特征点 信息
+
 
 @end
 
@@ -117,11 +123,13 @@
     self.viewCanvas.backgroundColor = [UIColor clearColor] ;
     // 滤镜
     _filter = [[TencentBeautyFilter alloc] init];
+    _Emptyfilter = [[LFGPUImageEmptyFilter alloc] init];
+    _Emptyfilter.imageData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"tumblr_ngukgdu1FA1s7ldogo1_500.gif" ofType:nil]] ;
     // 响应链
     
     GPUImageAlphaBlendFilter *blendFilter = [[GPUImageAlphaBlendFilter alloc] init];
     blendFilter.mix = 1.0;
-    UIView *temp = [[UIView alloc] initWithFrame:self.view.frame];
+    UIView *temp = [[UIView alloc] initWithFrame:_filterView.frame];
     
     
     // 时间 label
@@ -145,72 +153,103 @@
 
 
     
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 500, 100, 100)];
-    imageView.contentMode = UIViewContentModeScaleAspectFill;
-    imageView.gifPath = [[NSBundle mainBundle] pathForResource:@"tumblr_ngukgdu1FA1s7ldogo1_500.gif" ofType:nil];
-    [temp addSubview:imageView];
-    [imageView startGIF];
+//    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 500, 100, 100)];
+//    imageView.contentMode = UIViewContentModeScaleAspectFit;
+//    imageView.gifPath = [[NSBundle mainBundle] pathForResource:@"tumblr_ngukgdu1FA1s7ldogo1_500.gif" ofType:nil];
+////    imageView.animationImages = @[[UIImage imageNamed:@"mon_1"],[UIImage imageNamed:@"mon_2"],[UIImage imageNamed:@"mon_3"],[UIImage imageNamed:@"mon_4"],[UIImage imageNamed:@"mon_5"]];
+////    imageView.animationDuration = 1;
+////    [imageView startAnimating];
+//    [temp addSubview:imageView];
+//    [imageView startGIF];
 
     // 人脸识别的图片
     _imagearr = [NSMutableArray array];
-    for (NSInteger i = 0; i < 5; i ++ ) {
+    for (NSInteger i = 0; i < 4; i ++ ) {
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         imageView.contentMode = UIViewContentModeScaleAspectFill;
-//        imageView.image = [UIImage imageNamed:@"tumblr_ngukgdu1FA1s7ldogo1_500"];
         imageView.gifPath = [[NSBundle mainBundle] pathForResource:@"tumblr_ngukgdu1FA1s7ldogo1_500.gif" ofType:nil];
         [temp addSubview:imageView];
+        imageView.layer.masksToBounds=  YES;
         imageView.hidden = YES;
         [_imagearr addObject:imageView];
     }
 
-    // 滤镜与上面的 View 融合
-    //    NSDate *startTime = [NSDate date];
 
+    // 贴图 view
     _uiElementInput = [[GPUImageUIElement alloc] initWithView:temp];
 
+    
 #pragma mark  是否打开滤镜及动画
     if (useFilter ) { // 打开滤镜及动画
             [_videoCamera addTarget:_filter];
-//            [_filter addTarget:blendFilter];
-//            [_uiElementInput addTarget:blendFilter];
-//            [blendFilter addTarget:_filterView];
-            [_filter addTarget:_filterView];
+//            [_filter addTarget:_Emptyfilter];
+            [_filter addTarget:blendFilter];
+            [_uiElementInput addTarget:blendFilter];
+            [blendFilter addTarget:_filterView];
+//            [_filter addTarget:_filterView];
     } else { // 关闭滤镜动画
             [_videoCamera addTarget:_filterView];
     }
     self.blendFilter = blendFilter;
     
+        NSDate *startTime = [NSDate date];
     // 实时调用
-//    CGRect frame = timeLabel.frame;
-//    GXWeakSelf(weakSelf)
-//
-//    __unsafe_unretained GPUImageUIElement *weakUIElementInput = _uiElementInput;
-//    [_filter setFrameProcessingCompletionBlock:^(GPUImageOutput * filter, CMTime frameTime){
-//        // 控件移动
-//        CGFloat time = [startTime timeIntervalSinceNow];
-//        timeLabel.text = [NSString stringWithFormat:@"Time: %f s", -time];
-//        NSUInteger move = -time*10;
-//        if (move > 50) {
-//            move = move %50;
-//        }
-//        timeLabel.frame = CGRectMake(frame.origin.x + move, frame.origin.y + move, frame.size.width, frame.size.height);
-////        layer.frame = CGRectMake(frame.origin.x + move, frame.origin.y + move + 100, frame.size.width - move, frame.size.height + move);
-//
-//        // 显示人脸位置
-//        [weakSelf.imagearr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-//            UIImageView *imageView = obj;
-//            if (weakSelf.faceDetector && idx < self.faceBoundArr.count) {
+    CGRect frame = timeLabel.frame;
+    GXWeakSelf(weakSelf)
+
+    __unsafe_unretained GPUImageUIElement *weakUIElementInput = _uiElementInput;
+    [_filter setFrameProcessingCompletionBlock:^(GPUImageOutput * filter, CMTime frameTime){
+        // 控件移动
+        CGFloat time = [startTime timeIntervalSinceNow];
+        timeLabel.text = [NSString stringWithFormat:@"Time: %f s", -time];
+        NSUInteger move = -time*10;
+        if (move > 50) {
+            move = move %50;
+        }
+        timeLabel.frame = CGRectMake(frame.origin.x + move, frame.origin.y, frame.size.width, frame.size.height);
+//        layer.frame = CGRectMake(frame.origin.x + move, frame.origin.y + move + 100, frame.size.width - move, frame.size.height + move);
+
+//         显示人脸位置
+        [weakSelf.imagearr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            UIImageView *imageView = obj;
+            if (weakSelf.faceDetector && idx < weakSelf.faceInfos.count) {
+                
+                NSDictionary *facedict = weakSelf.faceInfos[idx];
+//                NSString *faceRectStr = [facedict objectForKey:RECT_KEY];
+                NSDictionary *facePointDict = [facedict objectForKey:POINTS_KEY];
+//                CGRect faceRect = CGRectFromString(faceRectStr);
+                CGPoint mouth_middle = CGPointFromString(facePointDict[@"mouth_middle"]);
+                CGPoint mouth_left_corner= CGPointFromString(facePointDict[@"mouth_left_corner"]);
+                CGPoint mouth_right_corner = CGPointFromString(facePointDict[@"mouth_right_corner"]);
+                CGPoint mouth_upper_lip_top= CGPointFromString(facePointDict[@"mouth_upper_lip_top"]);
+                CGPoint mouth_lower_lip_bottom = CGPointFromString(facePointDict[@"mouth_lower_lip_bottom"]);
+                CGFloat width = sqrt(pow((mouth_left_corner.x - mouth_right_corner.x), 2) + pow((mouth_left_corner.y - mouth_right_corner.y), 2)) ;;
+                CGFloat height = sqrt(pow((mouth_upper_lip_top.x - mouth_lower_lip_bottom.x), 2) + pow((mouth_upper_lip_top.y - mouth_lower_lip_bottom.y), 2)) ;;
+                
+                CGFloat rotate = [weakSelf rotateFromDict:facePointDict];
+                
+                imageView.transform = CGAffineTransformMakeRotation(rotate);
+
+//                imageView.gxWidth = width;
+//                imageView.gxHeight = height;
+                imageView.gxBwidth = width;
+                imageView.gxBheight = height;
+                imageView.center = mouth_middle;
+                
 //                imageView.frame = [(NSValue *)weakSelf.faceBoundArr[idx] CGRectValue] ;
-//                imageView .hidden = NO;
-//                [imageView startGIF];
-//            } else {
-//                imageView.hidden = YES;
-//                [imageView stopGIF];
-//            }
-//
-//        }];
-//        [weakUIElementInput update];
-//    }];
+                imageView .hidden = NO;
+                [imageView startGIF];
+            } else {
+                imageView.hidden = YES;
+                imageView.transform = CGAffineTransformIdentity;
+                [imageView stopGIF];
+            }
+
+        }];
+
+        
+        [weakUIElementInput update];
+    }];
     
     [_videoCamera startCameraCapture];
     
@@ -240,6 +279,34 @@
     [self createsfilterwitch:arr];
     
     
+}
+
+- (CGFloat)rotateFromDict:(NSDictionary *)facePointDict
+{
+    CGPoint left_eye_left_corner = CGPointFromString(facePointDict[@"left_eye_left_corner"]);
+    CGPoint left_eye_right_corner= CGPointFromString(facePointDict[@"right_eye_right_corner"]);
+    CGPoint nose_top = CGPointFromString(facePointDict[@"nose_top"]);
+    CGPoint eyeCenter = CGPointMake((left_eye_left_corner.x + left_eye_right_corner.x) / 2., (left_eye_left_corner.y + left_eye_right_corner.y) / 2.);
+    CGFloat y2 = eyeCenter.y;
+    CGFloat x2 = eyeCenter.x;
+    CGFloat y1 = nose_top.y;
+    CGFloat x1 = nose_top.x;
+
+    CGFloat rotate = atan((y2-y1)/(x2-x1));
+    return rotate;
+}
+- (UIImageView *)imageViewFromSet
+{
+    __block UIImageView *imageView = nil;
+    [_imagearr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        UIImageView *image = obj;
+        if (image.hidden == YES ) {
+            imageView = image;
+            *stop = YES;
+        }
+    }];
+    return imageView;
+
 }
 
 - (void)createsfilterwitch:(NSArray *)titles
@@ -413,7 +480,7 @@
     
     _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(480.0, 640.0)];
     _movieWriter.encodingLiveVideo = YES;
-    [self.filter addTarget:_movieWriter];
+    [self.blendFilter addTarget:_movieWriter];
     _videoCamera.audioEncodingTarget = _movieWriter;
     [_movieWriter startRecording];
     
@@ -425,7 +492,7 @@
     longG.view.backgroundColor = [UIColor redColor];
 //    [_videoCamera removeAudioInputsAndOutputs];
 
-    [self.filter removeTarget:_movieWriter];
+    [self.blendFilter removeTarget:_movieWriter];
     _videoCamera.audioEncodingTarget = nil;
     [_movieWriter finishRecording];
     
@@ -672,7 +739,7 @@
 -(void)onOutputFaceImage:(IFlyFaceImage*)faceImg{
     
     NSString* strResult=[self.iflyfaceDetector trackFrame:faceImg.data withWidth:faceImg.width height:faceImg.height direction:(int)faceImg.direction];
-    NSLog(@"result:%@",strResult);
+//    NSLog(@"result:%@",strResult);
     
     //此处清理图片数据，以防止因为不必要的图片数据的反复传递造成的内存卷积占用。
     faceImg.data=nil;
@@ -715,6 +782,7 @@
         if (ret || !faceArray || [faceArray count]<1) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self hideFace];
+                self.faceInfos = nil;
             } ) ;
             return;
         }
@@ -723,7 +791,8 @@
         
         NSMutableArray *arrPersons = [NSMutableArray array] ;
         
-        for(id faceInArr in faceArray){
+        for(id faceInArr in faceArray)
+        {
             
             if(faceInArr && [faceInArr isKindOfClass:[NSDictionary class]]){
                 
@@ -732,7 +801,7 @@
                 positionDic=nil;
                 
                 NSDictionary* landmarkDic=[faceInArr objectForKey:KCIFlyFaceResultLandmark];
-                NSMutableArray* strPoints=[self praseAlign:landmarkDic OrignImage:faceImg];
+                NSMutableDictionary* strPoints=[self praseAlign:landmarkDic OrignImage:faceImg];
                 landmarkDic=nil;
                 
                 
@@ -751,11 +820,14 @@
                 
                 dicPerson=nil;
                 
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self showFaceLandmarksAndFaceRectWithPersonsArray:arrPersons];
-                } ) ;
             }
         }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self showFaceLandmarksAndFaceRectWithPersonsArray:arrPersons];
+            _Emptyfilter.faceInfos = arrPersons;
+            self.faceInfos = arrPersons;
+        } ) ;
+        
         faceArray=nil;
     }
     @catch (NSException *exception) {
@@ -807,7 +879,7 @@
     
 }
 
--(NSMutableArray*)praseAlign:(NSDictionary* )landmarkDic OrignImage:(IFlyFaceImage*)faceImg{
+-(NSMutableDictionary *)praseAlign:(NSDictionary* )landmarkDic OrignImage:(IFlyFaceImage*)faceImg{
     if(!landmarkDic){
         return nil;
     }
@@ -819,7 +891,7 @@
     CGFloat widthScaleBy = self.filterView.frame.size.width / faceImg.height;
     CGFloat heightScaleBy = self.filterView.frame.size.height / faceImg.width;
     
-    NSMutableArray *arrStrPoints = [NSMutableArray array] ;
+    NSMutableDictionary *arrStrPoints = [NSMutableDictionary dictionary] ;
     NSEnumerator* keys=[landmarkDic keyEnumerator];
     for(id key in keys){
         id attr=[landmarkDic objectForKey:key];
@@ -838,7 +910,10 @@
             
             p=pScale(p, widthScaleBy, heightScaleBy);
             
-            [arrStrPoints addObject:NSStringFromCGPoint(p)];
+//            NSDictionary *dict = @{key : NSStringFromCGPoint(p)};
+//            [arrStrPoints addObject:dict];
+            [arrStrPoints setObject:NSStringFromCGPoint(p) forKey:key];
+//            dict = nil;
             
         }
     }

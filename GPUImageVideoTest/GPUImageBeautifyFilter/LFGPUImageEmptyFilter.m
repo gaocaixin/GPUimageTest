@@ -7,6 +7,11 @@
 //
 
 #import "LFGPUImageEmptyFilter.h"
+#import <GLKit/GLKit.h>
+//#import <GLKit/GLKMath.h>
+#define POINTS_KEY @"POINTS_KEY"
+#define RECT_KEY   @"RECT_KEY"
+#define RECT_ORI   @"RECT_ORI"
 
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 NSString *const kLFGPUImageEmptyFragmentShaderString = SHADER_STRING
@@ -48,6 +53,32 @@ NSString *const kGPUImageInvertFragmentShaderString = SHADER_STRING
     }
     
     return self;
+}
+- (void)setImageData:(NSData *)imageData
+{
+    _imageData = imageData;
+    // do something
+}
+- (void)setFaceInfos:(NSArray *)faceInfos
+{
+    _faceInfos = faceInfos;
+    
+}
+
+- (void)renderToTextureWithVertices:(const GLfloat *)vertices textureCoordinates:(const GLfloat *)textureCoordinates
+{
+    [super renderToTextureWithVertices:vertices textureCoordinates:textureCoordinates];
+    
+    // 绘制
+    [_faceInfos enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSDictionary *facedict = obj;
+        NSString *faceRectStr = [facedict objectForKey:RECT_KEY];
+        NSArray *facePointStrArr = [facedict objectForKey:POINTS_KEY];
+        
+        CGRect faceRect = CGRectFromString(faceRectStr);
+        
+    }];
+    
 }
 
 @end

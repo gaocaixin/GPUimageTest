@@ -23,8 +23,10 @@
     
     for (NSDictionary *dicPerson in self.arrPersons) {
         if ([dicPerson objectForKey:POINTS_KEY]) {
-            for (NSString *strPoints in [dicPerson objectForKey:POINTS_KEY]) {
-                CGPoint p = CGPointFromString(strPoints) ;
+            NSDictionary *dict = [dicPerson objectForKey:POINTS_KEY];
+            NSArray *arr = [dict allKeys];
+            for (NSString *strPointsdict in arr) {
+                CGPoint p = CGPointFromString(dict[strPointsdict]) ;
                 CGContextAddEllipseInRect(context, CGRectMake(p.x - 1 , p.y - 1 , 2 , 2));
             }
         }
