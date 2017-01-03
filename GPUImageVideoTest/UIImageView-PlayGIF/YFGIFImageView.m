@@ -88,6 +88,7 @@
 #pragma mark - Gif methods
 - (void)startGIF
 {
+
     _gifPixelSize = CGSizeZero;
     // 保证完全结束播放后，再开始新的播放
     // Be sure to start playback after finished playing.
@@ -127,6 +128,25 @@
                         [[YFGIFManager shared].displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:runLoopMode];
                     }
                 });
+            } else if (self.gifImages.count > 0) {
+//                [GXGif gxImgsToGifWithImgs:self.gifImages path:[GXFileManager.gxDocumentsPath stringByAppendingPathComponent:@"gif"] intervalTime:0.5];
+                CGSize pixcelSize = [(UIImage *)[self.gifImages firstObject] size];
+
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    // 获取图片尺寸
+                    _gifPixelSize = pixcelSize;
+                    CGFloat scale = [UIScreen mainScreen].scale;
+                    CGSize imgSize = CGSizeMake(pixcelSize.width/scale, pixcelSize.height/scale);
+                    if (didLoad) didLoad(imgSize);
+
+                    [[YFGIFManager shared].gifViewHashTable addObject:self];
+//                    _gifSourceRef = gifSourceRef;
+                    _frameCount = self.gifImages.count;
+                    if (![YFGIFManager shared].displayLink) {
+                        [YFGIFManager shared].displayLink = [CADisplayLink displayLinkWithTarget:[YFGIFManager shared] selector:@selector(play)];
+                        [[YFGIFManager shared].displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:runLoopMode];
+                    }
+                });
             }
         }
     });
@@ -152,11 +172,18 @@
         // Get image asynchronously.
         if(self.renderQueue.operationCount<=0) {
             [self.renderQueue addOperationWithBlock:^{
-                CGImageRef ref = CGImageSourceCreateImageAtIndex(_gifSourceRef, _index%_frameCount, NULL);
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    self.image = [UIImage imageWithCGImage:ref];
-                    CGImageRelease(ref);
-                });
+                if (_gifSourceRef) {
+                    CGImageRef ref = CGImageSourceCreateImageAtIndex(_gifSourceRef, _index%_frameCount, NULL);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self.image = [UIImage imageWithCGImage:ref];
+                        CGImageRelease(ref);
+                    });
+                } else if (self.gifImages.count > 0) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self.image = self.gifImages[_index%_frameCount];
+                    });
+                }
+
             }];
         }
         else {
@@ -165,7 +192,12 @@
         // 将下一帧更新为当前帧
         // The next frame is updated to the current frame.
         _index ++;
-        float nextFrameDuration = [self frameDurationAtIndex:_index%_frameCount];
+        float nextFrameDuration = 0;
+        if (_gifSourceRef) {
+            nextFrameDuration = [self frameDurationAtIndex:_index%_frameCount];
+        } else if (self.gifImages.count > 0) {
+            nextFrameDuration = self.gifImagesTime;
+        }
         _currentProgress += nextFrameDuration;
         // 声明本次播放结束
         // Declare this playing done.

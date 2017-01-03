@@ -10,7 +10,7 @@
 #import "ViewController.h"
 #import "GPUImage.h"
 #import "GPUImageBeautifyFilter.h"
-#import "UIImageView+PlayGIF.h"
+//#import "UIImageView+PlayGIF.h"
 #import "GXDevelop.h"
 #import "MovieViewController.h"
 #import "LFGPUImageBeautyFilter.h"
@@ -33,6 +33,8 @@
 #import "IFlyFaceImage.h"
 #import "IFlyFaceResultKeys.h"
 #import "LFGPUImageEmptyFilter.h"
+
+#import "YFGIFImageView.h"
 
 #define useFilter 1
 #define useFace 1
@@ -165,9 +167,11 @@
     // 人脸识别的图片
     _imagearr = [NSMutableArray array];
     for (NSInteger i = 0; i < 4; i ++ ) {
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        YFGIFImageView *imageView = [[YFGIFImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         imageView.contentMode = UIViewContentModeScaleAspectFill;
-        imageView.gifPath = [[NSBundle mainBundle] pathForResource:@"tumblr_ngukgdu1FA1s7ldogo1_500.gif" ofType:nil];
+//        imageView.gifPath = [[NSBundle mainBundle] pathForResource:@"tumblr_ngukgdu1FA1s7ldogo1_500.gif" ofType:nil];
+        imageView.gifImages = @[[UIImage imageNamed:@"mon_1"],[UIImage imageNamed:@"mon_2"],[UIImage imageNamed:@"mon_3"],[UIImage imageNamed:@"mon_4"],[UIImage imageNamed:@"mon_5"]];
+        imageView.gifImagesTime = 0.5;
         [temp addSubview:imageView];
         imageView.layer.masksToBounds=  YES;
         imageView.hidden = YES;
@@ -211,18 +215,18 @@
 
 //         显示人脸位置
         [weakSelf.imagearr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            UIImageView *imageView = obj;
+            YFGIFImageView *imageView = obj;
             if (weakSelf.faceDetector && idx < weakSelf.faceInfos.count) {
                 
                 NSDictionary *facedict = weakSelf.faceInfos[idx];
 //                NSString *faceRectStr = [facedict objectForKey:RECT_KEY];
                 NSDictionary *facePointDict = [facedict objectForKey:POINTS_KEY];
 //                CGRect faceRect = CGRectFromString(faceRectStr);
-                CGPoint mouth_middle = CGPointFromString(facePointDict[@"mouth_middle"]);
-                CGPoint mouth_left_corner= CGPointFromString(facePointDict[@"mouth_left_corner"]);
-                CGPoint mouth_right_corner = CGPointFromString(facePointDict[@"mouth_right_corner"]);
-                CGPoint mouth_upper_lip_top= CGPointFromString(facePointDict[@"mouth_upper_lip_top"]);
-                CGPoint mouth_lower_lip_bottom = CGPointFromString(facePointDict[@"mouth_lower_lip_bottom"]);
+                CGPoint mouth_middle = CGPointFromString(facePointDict[@"nose_top"]);
+                CGPoint mouth_left_corner= CGPointFromString(facePointDict[@"nose_left"]);
+                CGPoint mouth_right_corner = CGPointFromString(facePointDict[@"nose_right"]);
+                CGPoint mouth_upper_lip_top= CGPointFromString(facePointDict[@"nose_top"]);
+                CGPoint mouth_lower_lip_bottom = CGPointFromString(facePointDict[@"nose_bottom"]);
                 CGFloat width = sqrt(pow((mouth_left_corner.x - mouth_right_corner.x), 2) + pow((mouth_left_corner.y - mouth_right_corner.y), 2)) ;;
                 CGFloat height = sqrt(pow((mouth_upper_lip_top.x - mouth_lower_lip_bottom.x), 2) + pow((mouth_upper_lip_top.y - mouth_lower_lip_bottom.y), 2)) ;;
                 
@@ -232,8 +236,8 @@
 
 //                imageView.gxWidth = width;
 //                imageView.gxHeight = height;
-                imageView.gxBwidth = width;
-                imageView.gxBheight = height;
+                imageView.gxBwidth = width *2;
+                imageView.gxBheight = height*5;
                 imageView.center = mouth_middle;
                 
 //                imageView.frame = [(NSValue *)weakSelf.faceBoundArr[idx] CGRectValue] ;

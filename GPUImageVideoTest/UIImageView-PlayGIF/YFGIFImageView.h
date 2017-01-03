@@ -49,6 +49,10 @@
 @property (nonatomic, strong) NSData            *gifData;
 @property (nonatomic, assign, readonly) CGSize  gifPixelSize;
 @property (nonatomic, assign) BOOL              unRepeat;
+
+@property (nonatomic, strong) NSArray          *gifImages; // gif image 数组
+@property (nonatomic,  assign) CGFloat            gifImagesTime; // gif 动画时间
+
 @property (copy, nonatomic) void(^playingComplete)();
 - (void)startGIF;
 - (void)startGIFWithRunLoopMode:(NSString * const)runLoopMode andImageDidLoad:(void(^)(CGSize imageSize))didLoad;
