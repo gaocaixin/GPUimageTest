@@ -93,7 +93,7 @@
                                                      [self updateAccelertionData:accelerometerData.acceleration];
                                                  }
                                                  else{
-                                                     NSLog(@"%@", error);
+                                                     NSLog(@"motionManagererror:%@", error);
                                                  }
                                              }];
     
@@ -134,14 +134,14 @@
     UIView *temp = [[UIView alloc] initWithFrame:_filterView.frame];
     
     
-    // 时间 label
-    UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 100.0, 240.0f, 40.0f)];
-    timeLabel.font = [UIFont systemFontOfSize:17.0f];
-    timeLabel.text = @"Time: 0.0 s";
-    timeLabel.textAlignment = NSTextAlignmentCenter;
-    timeLabel.backgroundColor = [UIColor clearColor];
-    timeLabel.textColor = [UIColor whiteColor];
-    [temp addSubview:timeLabel];
+//    // 时间 label
+//    UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 100.0, 240.0f, 40.0f)];
+//    timeLabel.font = [UIFont systemFontOfSize:17.0f];
+//    timeLabel.text = @"Time: 0.0 s";
+//    timeLabel.textAlignment = NSTextAlignmentCenter;
+//    timeLabel.backgroundColor = [UIColor clearColor];
+//    timeLabel.textColor = [UIColor whiteColor];
+//    [temp addSubview:timeLabel];
     
     UILabel *descLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 00.0, 375.0f, 80.0f)];
     descLabel.font = [UIFont systemFontOfSize:17.0f];
@@ -196,21 +196,21 @@
     }
     self.blendFilter = blendFilter;
     
-        NSDate *startTime = [NSDate date];
+//        NSDate *startTime = [NSDate date];
     // 实时调用
-    CGRect frame = timeLabel.frame;
+//    CGRect frame = timeLabel.frame;
     GXWeakSelf(weakSelf)
 
     __unsafe_unretained GPUImageUIElement *weakUIElementInput = _uiElementInput;
     [_filter setFrameProcessingCompletionBlock:^(GPUImageOutput * filter, CMTime frameTime){
         // 控件移动
-        CGFloat time = [startTime timeIntervalSinceNow];
-        timeLabel.text = [NSString stringWithFormat:@"Time: %f s", -time];
-        NSUInteger move = -time*10;
-        if (move > 50) {
-            move = move %50;
-        }
-        timeLabel.frame = CGRectMake(frame.origin.x + move, frame.origin.y, frame.size.width, frame.size.height);
+//        CGFloat time = [startTime timeIntervalSinceNow];
+//        timeLabel.text = [NSString stringWithFormat:@"Time: %f s", -time];
+//        NSUInteger move = -time*10;
+//        if (move > 50) {
+//            move = move %50;
+//        }
+//        timeLabel.frame = CGRectMake(frame.origin.x + move, frame.origin.y, frame.size.width, frame.size.height);
 //        layer.frame = CGRectMake(frame.origin.x + move, frame.origin.y + move + 100, frame.size.width - move, frame.size.height + move);
 
 //         显示人脸位置
@@ -236,7 +236,7 @@
 
 //                imageView.gxWidth = width;
 //                imageView.gxHeight = height;
-                imageView.gxBwidth = width *2;
+                imageView.gxBwidth = width *3;
                 imageView.gxBheight = height*5;
                 imageView.center = mouth_middle;
                 
@@ -512,7 +512,7 @@
     
     NSLog(@"%@",videoPath);
     
-    NSLog(@"%@",error);
+//    NSLog(@"%@",error);
     
 }
 
@@ -571,7 +571,7 @@
             //            
             //        }
             self.faceBounds = faceRect;
-            NSLog(@"%@", NSStringFromCGRect(faceRect));
+//            NSLog(@"%@", NSStringFromCGRect(faceRect));
             [arr addObject:[NSValue valueWithCGRect:faceRect]];
         }
     self.faceBoundArr = [NSArray arrayWithArray:arr];

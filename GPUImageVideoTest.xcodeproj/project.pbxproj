@@ -1005,6 +1005,7 @@
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/GPUImageVideoTest/Header.h";
 				INFOPLIST_FILE = GPUImageVideoTest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = qqq.GPUImageVideoTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1024,6 +1025,7 @@
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/GPUImageVideoTest/Header.h";
 				INFOPLIST_FILE = GPUImageVideoTest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = qqq.GPUImageVideoTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
