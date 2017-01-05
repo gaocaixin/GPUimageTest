@@ -39,6 +39,8 @@
 #define useFilter 1
 #define useFace 1
 
+#define GPUImageVideoCameraframeRate 30
+
 @interface ViewController ()<GPUImageVideoCameraDelegate>
 
 @property(strong, nonatomic) GPUImageVideoCamera *videoCamera;
@@ -109,14 +111,15 @@
 
     // 摄像头
     _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionFront];
+    _videoCamera.frameRate = GPUImageVideoCameraframeRate;
     _videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
     _videoCamera.delegate = self;
     [_videoCamera addAudioInputsAndOutputs];
     self.videoCamera.horizontallyMirrorFrontFacingCamera = YES;
 
     // 显示层
-    _filterView = [[GPUImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.gxWidth, self.view.gxWidth * 640./480)];
-    _filterView.fillMode = kGPUImageFillModePreserveAspectRatio;
+    _filterView = [[GPUImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.gxWidth, self.view.gxWidth*640/480.)];
+    _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
     [self.view addSubview:_filterView];
     
     self.viewCanvas = [[CanvasView alloc] initWithFrame:_filterView.frame] ;
@@ -143,7 +146,7 @@
 //    timeLabel.textColor = [UIColor whiteColor];
 //    [temp addSubview:timeLabel];
     
-    UILabel *descLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 00.0, 375.0f, 80.0f)];
+    UILabel *descLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 00.0, self.view.gxWidth, 80.0f)];
     descLabel.font = [UIFont systemFontOfSize:17.0f];
     descLabel.text = @"美颜滤镜+人脸识别+动态gif图+动态UI视图+视频录制";
     descLabel.textAlignment = NSTextAlignmentCenter;
@@ -264,7 +267,7 @@
     [self.view addSubview:moverView];
     moverView.backgroundColor = [UIColor redColor];
     moverView.gxMaxX = self.view.gxWidth;
-    moverView.gxY = _filterView.gxMaxY + 10;
+    moverView.gxMaxY = self.view.gxHeight;
     UILongPressGestureRecognizer *longG = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longG:)];
     [moverView addGestureRecognizer:longG];
     
@@ -293,8 +296,13 @@
 //    CGPoint eyeCenter = CGPointMake((left_eye_left_corner.x + right_eye_right_corner.x) / 2., (left_eye_left_corner.y + right_eye_right_corner.y) / 2.);
     CGPoint point0 = left_eye_left_corner;
     CGPoint point1 = right_eye_right_corner;
+    CGFloat rotate = 0;
+    if (self.videoCamera.inputCamera.position == AVCaptureDevicePositionFront) {
+        rotate = atan2( point0.y-point1.y, point0.x-point1.x );
 
-    CGFloat rotate = atan2( point0.y-point1.y, point0.x-point1.x );
+    } else {
+        rotate = atan2( point1.y - point0.y, point1.x - point0.x);
+    }
     return rotate;
 }
 - (UIImageView *)imageViewFromSet
@@ -317,7 +325,7 @@
     //    CGFloat padding = 5;
     CGFloat width = self.view.gxWidth / 4;
     [titles enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        UISlider *swi = [[UISlider alloc] initWithFrame:CGRectMake(0, _filterView.gxMaxY+height*idx, width, height)];
+        UISlider *swi = [[UISlider alloc] initWithFrame:CGRectMake(0, self.view.gxHeight-height-height-height*idx, width, height)];
         swi.value = 0.5;
         swi.tag = idx;
         [swi addTarget:self action:@selector(filtervalueChange:) forControlEvents:UIControlEventValueChanged];
@@ -371,14 +379,14 @@
 {
     CGFloat height = 40;
 //    CGFloat padding = 5;
-    CGFloat width = self.view.gxWidth / titles.count;
+    CGFloat width = self.view.gxWidth / 4;
     [titles enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         UISwitch *swi = [[UISwitch alloc] initWithFrame:CGRectMake(width * idx, self.view.gxHeight-height, width, height)];
         swi.tag = idx;
         swi.on = YES;
         [swi addTarget:self action:@selector(valueChange:) forControlEvents:UIControlEventValueChanged];
         [self.view addSubview:swi];
-        UILabel *label =[[UILabel alloc] initWithFrame:CGRectMake(swi.gxX, swi.gxY - height, swi.gxWidth, swi.gxHeight)];
+        UILabel *label =[[UILabel alloc] initWithFrame:CGRectMake(swi.gxMaxX, swi.gxY , swi.gxWidth, swi.gxHeight)];
         label.text = obj;
         label.textAlignment = NSTextAlignmentCenter;
         label.font = [UIFont systemFontOfSize:12];
@@ -440,6 +448,8 @@
 - (void)Switchingcamera:(BOOL)on
 {
     [self.videoCamera rotateCamera];
+    _videoCamera.frameRate = GPUImageVideoCameraframeRate;
+
 }
 
 - (void)longG:(UIGestureRecognizer *)longG

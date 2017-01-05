@@ -673,7 +673,7 @@
 				TargetAttributes = {
 					33FCBE9A1E1109C800A50207 = {
 						CreatedOnToolsVersion = 8.2;
-						DevelopmentTeam = MZVDMJT3TZ;
+						DevelopmentTeam = 82QBPYTBDM;
 						ProvisioningStyle = Automatic;
 					};
 					33FCBEB31E1109C800A50207 = {
@@ -997,7 +997,7 @@
 			baseConfigurationReference = 42CC1983B3FC4F8E7F08C0D6 /* Pods-GPUImageVideoTest.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = MZVDMJT3TZ;
+				DEVELOPMENT_TEAM = 82QBPYTBDM;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1017,7 +1017,7 @@
 			baseConfigurationReference = 551659E519AA510A6D36A2E4 /* Pods-GPUImageVideoTest.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = MZVDMJT3TZ;
+				DEVELOPMENT_TEAM = 82QBPYTBDM;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

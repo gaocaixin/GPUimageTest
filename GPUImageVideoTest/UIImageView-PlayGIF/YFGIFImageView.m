@@ -69,6 +69,16 @@
 @end
 
 @implementation YFGIFImageView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.gifImagesTime = 0.5;
+    }
+    return self;
+}
+
 #pragma mark - property settings
 - (NSOperationQueue *)renderQueue {
     if (!_renderQueue) {
