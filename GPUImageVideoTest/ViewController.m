@@ -204,61 +204,16 @@
 //    CGRect frame = timeLabel.frame;
     GXWeakSelf(weakSelf)
 
-    __unsafe_unretained GPUImageUIElement *weakUIElementInput = _uiElementInput;
+//    __unsafe_unretained GPUImageUIElement *weakUIElementInput = _uiElementInput;
+    
     [_filter setFrameProcessingCompletionBlock:^(GPUImageOutput * filter, CMTime frameTime){
-        // 控件移动
-//        CGFloat time = [startTime timeIntervalSinceNow];
-//        timeLabel.text = [NSString stringWithFormat:@"Time: %f s", -time];
-//        NSUInteger move = -time*10;
-//        if (move > 50) {
-//            move = move %50;
-//        }
-//        timeLabel.frame = CGRectMake(frame.origin.x + move, frame.origin.y, frame.size.width, frame.size.height);
-//        layer.frame = CGRectMake(frame.origin.x + move, frame.origin.y + move + 100, frame.size.width - move, frame.size.height + move);
-
-//         显示人脸位置
-        [weakSelf.imagearr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            YFGIFImageView *imageView = obj;
-            if (weakSelf.faceDetector && idx < weakSelf.faceInfos.count) {
-                
-                NSDictionary *facedict = weakSelf.faceInfos[idx];
-//                NSString *faceRectStr = [facedict objectForKey:RECT_KEY];
-                NSDictionary *facePointDict = [facedict objectForKey:POINTS_KEY];
-//                CGRect faceRect = CGRectFromString(faceRectStr);
-                CGPoint mouth_middle = CGPointFromString(facePointDict[@"nose_top"]);
-                CGPoint mouth_left_corner= CGPointFromString(facePointDict[@"nose_left"]);
-                CGPoint mouth_right_corner = CGPointFromString(facePointDict[@"nose_right"]);
-                CGPoint mouth_upper_lip_top= CGPointFromString(facePointDict[@"nose_top"]);
-                CGPoint mouth_lower_lip_bottom = CGPointFromString(facePointDict[@"nose_bottom"]);
-                CGFloat width = sqrt(pow((mouth_left_corner.x - mouth_right_corner.x), 2) + pow((mouth_left_corner.y - mouth_right_corner.y), 2)) ;;
-                CGFloat height = sqrt(pow((mouth_upper_lip_top.x - mouth_lower_lip_bottom.x), 2) + pow((mouth_upper_lip_top.y - mouth_lower_lip_bottom.y), 2)) ;;
-                
-                CGFloat rotate = [weakSelf rotateFromDict:facePointDict];
-                
-                imageView.transform = CGAffineTransformMakeRotation(rotate);
-
-//                imageView.gxWidth = width;
-//                imageView.gxHeight = height;
-                imageView.gxBwidth = width *3;
-                imageView.gxBheight = height*5;
-                imageView.center = mouth_middle;
-                
-//                imageView.frame = [(NSValue *)weakSelf.faceBoundArr[idx] CGRectValue] ;
-                imageView .hidden = NO;
-                [imageView startGIF];
-            } else {
-                imageView.hidden = YES;
-                imageView.transform = CGAffineTransformIdentity;
-                [imageView stopGIF];
-            }
-
-        }];
-
-        
-        [weakUIElementInput update];
+//        [weakSelf reSetFaceUI];
+        [weakSelf.uiElementInput update];
     }];
     
-    [_videoCamera startCameraCapture];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+       [_videoCamera startCameraCapture];
+    });
     
 
     // 长按录制
@@ -286,6 +241,54 @@
     [self createsfilterwitch:arr];
     
     
+}
+
+- (void)needUpdateFace
+{
+    runAsynchronouslyOnVideoProcessingQueue(^{
+        [self.uiElementInput update];
+    });
+}
+
+- (void)reSetFaceUI
+{
+    //         显示人脸位置
+    [self.imagearr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        YFGIFImageView *imageView = obj;
+        if (idx < self.faceInfos.count) {
+            
+            NSDictionary *facedict = self.faceInfos[idx];
+            //                NSString *faceRectStr = [facedict objectForKey:RECT_KEY];
+            NSDictionary *facePointDict = [facedict objectForKey:POINTS_KEY];
+            //                CGRect faceRect = CGRectFromString(faceRectStr);
+            CGPoint mouth_middle = CGPointFromString(facePointDict[@"nose_top"]);
+            CGPoint mouth_left_corner= CGPointFromString(facePointDict[@"nose_left"]);
+            CGPoint mouth_right_corner = CGPointFromString(facePointDict[@"nose_right"]);
+            CGPoint mouth_upper_lip_top= CGPointFromString(facePointDict[@"nose_top"]);
+            CGPoint mouth_lower_lip_bottom = CGPointFromString(facePointDict[@"nose_bottom"]);
+            CGFloat width = sqrt(pow((mouth_left_corner.x - mouth_right_corner.x), 2) + pow((mouth_left_corner.y - mouth_right_corner.y), 2)) ;;
+            CGFloat height = sqrt(pow((mouth_upper_lip_top.x - mouth_lower_lip_bottom.x), 2) + pow((mouth_upper_lip_top.y - mouth_lower_lip_bottom.y), 2)) ;;
+            
+            CGFloat rotate = [self rotateFromDict:facePointDict];
+            
+            imageView.transform = CGAffineTransformMakeRotation(rotate);
+            
+            //                imageView.gxWidth = width;
+            //                imageView.gxHeight = height;
+            imageView.gxBwidth = width *3;
+            imageView.gxBheight = height*5;
+            imageView.center = mouth_middle;
+            
+            //                imageView.frame = [(NSValue *)weakSelf.faceBoundArr[idx] CGRectValue] ;
+            imageView .hidden = NO;
+            [imageView startGIF];
+        } else {
+            imageView.hidden = YES;
+            imageView.transform = CGAffineTransformIdentity;
+            [imageView stopGIF];
+        }
+        
+    }];
 }
 
 - (CGFloat)rotateFromDict:(NSDictionary *)facePointDict
@@ -837,7 +840,8 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideFace) object:nil];
             [self showFaceLandmarksAndFaceRectWithPersonsArray:arrPersons];
-
+            [self reSetFaceUI];
+//            [self needUpdateFace];
         } ) ;
         
         faceArray=nil;
@@ -934,10 +938,14 @@
 }
 
 - (void) hideFace {
+    if (!self.faceInfos) {
+        return;
+    }
     self.faceInfos = nil;
     if (!self.viewCanvas.hidden) {
         self.viewCanvas.hidden = YES ;
     }
+    [self reSetFaceUI];
 //    [self.blendFilter disableSecondFrameCheck];
 }
 - (void) showFaceLandmarksAndFaceRectWithPersonsArray:(NSMutableArray *)arrPersons{
