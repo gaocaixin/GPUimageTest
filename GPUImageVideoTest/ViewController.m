@@ -793,8 +793,8 @@
         //没有检测到人脸或发生错误
         if (ret || !faceArray || [faceArray count]<1) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self hideFace];
-                self.faceInfos = nil;
+                [self performSelector:@selector(hideFace) withObject:nil afterDelay:0.2];
+                
             } ) ;
             return;
         }
@@ -835,9 +835,9 @@
             }
         }
         dispatch_async(dispatch_get_main_queue(), ^{
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideFace) object:nil];
             [self showFaceLandmarksAndFaceRectWithPersonsArray:arrPersons];
-            _Emptyfilter.faceInfos = arrPersons;
-            self.faceInfos = arrPersons;
+
         } ) ;
         
         faceArray=nil;
@@ -934,6 +934,7 @@
 }
 
 - (void) hideFace {
+    self.faceInfos = nil;
     if (!self.viewCanvas.hidden) {
         self.viewCanvas.hidden = YES ;
     }
@@ -945,6 +946,9 @@
     }
     self.viewCanvas.arrPersons = arrPersons ;
     [self.viewCanvas setNeedsDisplay] ;
+    
+    _Emptyfilter.faceInfos = arrPersons;
+    self.faceInfos = arrPersons;
 //    [self.blendFilter ];
 
 }
