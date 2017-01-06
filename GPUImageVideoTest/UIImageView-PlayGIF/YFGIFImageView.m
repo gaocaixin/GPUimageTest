@@ -98,6 +98,7 @@
 #pragma mark - Gif methods
 - (void)startGIF
 {
+    if ([[YFGIFManager shared].gifViewHashTable containsObject:self]) {return; }
 
     _gifPixelSize = CGSizeZero;
     // 保证完全结束播放后，再开始新的播放
@@ -163,6 +164,8 @@
 }
 
 - (void)stopGIF{
+    if (![[YFGIFManager shared].gifViewHashTable containsObject:self]) {return; }
+
     [self.renderQueue addOperationWithBlock:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             if (_gifSourceRef) {

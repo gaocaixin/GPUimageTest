@@ -74,7 +74,7 @@
 @property (nonatomic) UIInterfaceOrientation interfaceOrientation;
 @property (strong,nonatomic) CMMotionManager *motionManager;
 
-@property (nonatomic, weak)NSArray  *faceInfos; // 人脸信息集 每个人脸的 rect 和特征点 信息
+@property (nonatomic, strong)NSArray  *faceInfos; // 人脸信息集 每个人脸的 rect 和特征点 信息
 
 @property (nonatomic, weak)UIView * elementView;
 
@@ -136,7 +136,7 @@
     // 响应链
     
     GPUImageAlphaBlendFilter *blendFilter = [[GPUImageAlphaBlendFilter alloc] init];
-    blendFilter.mix = 1.0;
+    blendFilter.mix = 1;
     UIView *temp = [[UIView alloc] initWithFrame:_filterView.frame];
     
     self.viewCanvas = [[CanvasView alloc] initWithFrame:_filterView.frame] ;
@@ -215,7 +215,8 @@
     
     [_filter setFrameProcessingCompletionBlock:^(GPUImageOutput * filter, CMTime frameTime){
 //        [weakSelf reSetFaceUI];
-        [weakSelf.uiElementInput update];
+//        [weakSelf.uiElementInput update];
+        [weakSelf needUpdateFace];
     }];
     
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
@@ -862,8 +863,11 @@
         }
         //没有检测到人脸或发生错误
         if (ret || !faceArray || [faceArray count]<1) {
+            if (!self.faceInfos) {
+                return;
+            }
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self performSelector:@selector(hideFace) withObject:nil afterDelay:0.2];
+                [self performSelector:@selector(hideFace) withObject:nil afterDelay:0.1];
                 
             } ) ;
             return;
@@ -1013,9 +1017,7 @@
 }
 
 - (void) hideFace {
-    if (!self.faceInfos) {
-        return;
-    }
+
     self.faceInfos = nil;
     if (!self.viewCanvas.hidden) {
         self.viewCanvas.hidden = YES ;
