@@ -140,9 +140,9 @@
     UIView *temp = [[UIView alloc] initWithFrame:_filterView.frame];
     
     self.viewCanvas = [[CanvasView alloc] initWithFrame:_filterView.frame] ;
-    [temp addSubview:self.viewCanvas] ;
-    //    self.viewCanvas.center=self.captureManager.previewLayer.position;
-    self.viewCanvas.backgroundColor = [UIColor clearColor] ;
+//    [temp addSubview:self.viewCanvas] ;
+//    //    self.viewCanvas.center=self.captureManager.previewLayer.position;
+//    self.viewCanvas.backgroundColor = [UIColor clearColor] ;
 //    // 时间 label
 //    UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 100.0, 240.0f, 40.0f)];
 //    timeLabel.font = [UIFont systemFontOfSize:17.0f];
@@ -152,14 +152,14 @@
 //    timeLabel.textColor = [UIColor whiteColor];
 //    [temp addSubview:timeLabel];
     
-    UILabel *descLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 00.0, self.view.gxWidth, 80.0f)];
-    descLabel.font = [UIFont systemFontOfSize:17.0f];
-    descLabel.text = @"美颜滤镜+人脸识别+动态gif图+动态UI视图+视频录制";
-    descLabel.textAlignment = NSTextAlignmentCenter;
-    descLabel.backgroundColor = [UIColor clearColor];
-    descLabel.textColor = [UIColor yellowColor];
-    descLabel.numberOfLines = 0;
-    [temp addSubview:descLabel];
+//    UILabel *descLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 00.0, self.view.gxWidth, 80.0f)];
+//    descLabel.font = [UIFont systemFontOfSize:17.0f];
+//    descLabel.text = @"美颜滤镜+人脸识别+动态gif图+动态UI视图+视频录制";
+//    descLabel.textAlignment = NSTextAlignmentCenter;
+//    descLabel.backgroundColor = [UIColor clearColor];
+//    descLabel.textColor = [UIColor yellowColor];
+//    descLabel.numberOfLines = 0;
+//    [temp addSubview:descLabel];
 
 
 
@@ -239,7 +239,7 @@
     
     UILabel *moverLabel = [[UILabel alloc] initWithFrame:UIEdgeInsetsInsetRect(moverView.frame, UIEdgeInsetsMake(0, 10, 0, 10))];
     [self.view addSubview:moverLabel];
-    moverLabel.text = @"长按此控件录制以上视频,松手结束录制,到系统相册内查看视频";
+    moverLabel.text = @"点击拍照,长按录制视频(到系统相册内查看)";
     moverLabel. textColor = [UIColor whiteColor];
     moverLabel.numberOfLines = 0;
     moverLabel.font = [UIFont systemFontOfSize:12];
@@ -395,9 +395,9 @@
 {
     CGFloat height = 40;
 //    CGFloat padding = 5;
-    CGFloat width = self.view.gxWidth / 4;
+    CGFloat width = self.view.gxWidth / 2/ titles.count/2;
     [titles enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        UISwitch *swi = [[UISwitch alloc] initWithFrame:CGRectMake(width * idx, self.view.gxHeight-height, width, height)];
+        UISwitch *swi = [[UISwitch alloc] initWithFrame:CGRectMake(2*width * idx, self.view.gxHeight-height, width, height)];
         swi.tag = idx;
         swi.on = YES;
         [swi addTarget:self action:@selector(valueChange:) forControlEvents:UIControlEventValueChanged];
@@ -906,7 +906,9 @@
         }
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideFace) object:nil];
-            [self showFaceLandmarksAndFaceRectWithPersonsArray:arrPersons];
+//            [self showFaceLandmarksAndFaceRectWithPersonsArray:arrPersons];
+            self.faceInfos = arrPersons;
+
             [self reSetFaceUI];
 //            [self needUpdateFace];
         } ) ;
