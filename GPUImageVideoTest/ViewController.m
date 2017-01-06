@@ -36,6 +36,8 @@
 
 #import "YFGIFImageView.h"
 
+#import <Photos/Photos.h>
+
 #define useFilter 1
 #define useFace 1
 
@@ -43,10 +45,10 @@
 
 @interface ViewController ()<GPUImageVideoCameraDelegate>
 
-@property(strong, nonatomic) GPUImageVideoCamera *videoCamera;
-@property(strong, nonatomic) GPUImageFilter *filter;
+@property(strong, nonatomic) GPUImageStillCamera *videoCamera;
+@property(strong, nonatomic) TencentBeautyFilter *filter;
 @property(strong, nonatomic) LFGPUImageEmptyFilter *Emptyfilter;
-
+@property(strong, nonatomic) GPUImageCropFilter *cropFilter;
 @property(strong, nonatomic) GPUImageView *filterView;
 @property(strong, nonatomic) GPUImageUIElement *uiElementInput;
 @property(strong, nonatomic) CIDetector *faceDetector;
@@ -73,6 +75,10 @@
 @property (strong,nonatomic) CMMotionManager *motionManager;
 
 @property (nonatomic, weak)NSArray  *faceInfos; // 人脸信息集 每个人脸的 rect 和特征点 信息
+
+@property (nonatomic, weak)UIView * elementView;
+
+@property (nonatomic, assign)CGFloat scale;
 
 
 @end
@@ -110,7 +116,7 @@
 
 
     // 摄像头
-    _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionFront];
+    _videoCamera = [[GPUImageStillCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionFront];
     _videoCamera.frameRate = GPUImageVideoCameraframeRate;
     _videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
     _videoCamera.delegate = self;
@@ -122,10 +128,7 @@
     _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
     [self.view addSubview:_filterView];
     
-    self.viewCanvas = [[CanvasView alloc] initWithFrame:_filterView.frame] ;
-    [self.filterView addSubview:self.viewCanvas] ;
-//    self.viewCanvas.center=self.captureManager.previewLayer.position;
-    self.viewCanvas.backgroundColor = [UIColor clearColor] ;
+
     // 滤镜
     _filter = [[TencentBeautyFilter alloc] init];
     _Emptyfilter = [[LFGPUImageEmptyFilter alloc] init];
@@ -136,7 +139,10 @@
     blendFilter.mix = 1.0;
     UIView *temp = [[UIView alloc] initWithFrame:_filterView.frame];
     
-    
+    self.viewCanvas = [[CanvasView alloc] initWithFrame:_filterView.frame] ;
+    [temp addSubview:self.viewCanvas] ;
+    //    self.viewCanvas.center=self.captureManager.previewLayer.position;
+    self.viewCanvas.backgroundColor = [UIColor clearColor] ;
 //    // 时间 label
 //    UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 100.0, 240.0f, 40.0f)];
 //    timeLabel.font = [UIFont systemFontOfSize:17.0f];
@@ -184,15 +190,16 @@
 
     // 贴图 view
     _uiElementInput = [[GPUImageUIElement alloc] initWithView:temp];
+    self.elementView = temp;
 
-    
 #pragma mark  是否打开滤镜及动画
     if (useFilter ) { // 打开滤镜及动画
             [_videoCamera addTarget:_filter];
-//            [_filter addTarget:_Emptyfilter];
+//            [_cropFilter addTarget:_filter];
             [_filter addTarget:blendFilter];
             [_uiElementInput addTarget:blendFilter];
             [blendFilter addTarget:_filterView];
+        [blendFilter disableSecondFrameCheck];
 //            [_filter addTarget:_filterView];
     } else { // 关闭滤镜动画
             [_videoCamera addTarget:_filterView];
@@ -216,15 +223,19 @@
     });
     
 
-    // 长按录制
     UIView *moverView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 180, 60)];
     moverView.layer.cornerRadius = moverView.frame.size.height/2.;
     [self.view addSubview:moverView];
     moverView.backgroundColor = [UIColor redColor];
     moverView.gxMaxX = self.view.gxWidth;
     moverView.gxMaxY = self.view.gxHeight;
+    // 长按录制
     UILongPressGestureRecognizer *longG = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longG:)];
     [moverView addGestureRecognizer:longG];
+
+    // 点击拍照
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    [moverView addGestureRecognizer:tap];
     
     UILabel *moverLabel = [[UILabel alloc] initWithFrame:UIEdgeInsetsInsetRect(moverView.frame, UIEdgeInsetsMake(0, 10, 0, 10))];
     [self.view addSubview:moverLabel];
@@ -234,7 +245,7 @@
     moverLabel.font = [UIFont systemFontOfSize:12];
     moverLabel.textAlignment = NSTextAlignmentCenter;
     
-    NSArray *titles = @[@"切换摄像头"];
+    NSArray *titles = @[@"切换摄像头",@"1:1"];
     [self createswitch:titles];
     
     NSArray * arr = @[@"滤镜beauty", @"滤镜tone"];
@@ -242,6 +253,8 @@
     
     
 }
+
+
 
 - (void)needUpdateFace
 {
@@ -398,7 +411,7 @@
         [self.view addSubview:label];
         
         if (idx == 1) {
-            swi.enabled = NO;
+            swi.on = NO;
         }
     }];
 }
@@ -411,10 +424,39 @@
             [self Switchingcamera:sw.on];
         }
             break;
+        case 1:
+        {
+            [self rotate:sw.on];
+        }
+            break;
             
         default:
             break;
     }
+}
+- (void)rotate:(BOOL)on
+{
+//    CGRect rect ;
+    CGFloat height = self.view.gxWidth;
+    _scale = 640/480.;
+    if (on) {
+        _scale = 1;
+    } else {
+        height = self.view.gxWidth*640/480.;
+    }
+
+//    CGFloat heightscale = MAX(0, MIN(1, height/_filterView.gxHeight));
+//    
+//    _cropFilter.cropRegion= CGRectMake(0, (1-heightscale)/2., 1, heightscale);
+    _filterView.frame = CGRectMake(0, 0, self.view.gxWidth, height);
+//    self.elementView.frame = _filterView.frame;
+    
+    if (on) {
+        
+    } else {
+        self.viewCanvas.bounds = _filterView.bounds;
+    }
+//    self.viewCanvas.frame = _filterView.frame ;
 }
 
 - (void)Facerecognition:(BOOL)on
@@ -455,6 +497,20 @@
 
 }
 
+- (void)tap:(UIGestureRecognizer *)tap
+{
+    [self.videoCamera capturePhotoAsImageProcessedUpToFilter:self.blendFilter withCompletionHandler:^(UIImage *processedImage, NSError *error) {
+        UIImage *image = processedImage;
+        [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+            PHAssetChangeRequest *req = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+        } completionHandler:^(BOOL success, NSError * _Nullable error) {
+            
+            NSLog(@"success = %d, error = %@", success, error);
+            
+        }];
+    }];
+}
+
 - (void)longG:(UIGestureRecognizer *)longG
 {
     switch (longG.state) {
@@ -493,9 +549,19 @@
     NSURL *movieURL = [NSURL fileURLWithPath:pathToMovie];
 //    unlink([pathToMovie UTF8String]); // 如果已经存在文件，AVAssetWriter会有异常，删除旧文件
     
-    _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(480.0, 640.0)];
+    _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:_filterView.gxSize];
     _movieWriter.encodingLiveVideo = YES;
-    [self.blendFilter addTarget:_movieWriter];
+    
+    CGRect rect = CGRectMake(0, 0, 1, 1);
+    if (_filterView.gxSize.height == _filterView.gxSize.width) {
+        CGFloat heightscale = _filterView.gxSize.width/ (self.view.gxWidth*640/480.) ;
+
+        rect = CGRectMake(0, (1-heightscale)/2, 1, heightscale);
+    }
+    _cropFilter = [[GPUImageCropFilter alloc] initWithCropRegion:rect];
+
+    [self.blendFilter addTarget:_cropFilter];
+    [_cropFilter addTarget:_movieWriter];
     _videoCamera.audioEncodingTarget = _movieWriter;
     [_movieWriter startRecording];
     
@@ -507,7 +573,7 @@
     longG.view.backgroundColor = [UIColor redColor];
 //    [_videoCamera removeAudioInputsAndOutputs];
 
-    [self.blendFilter removeTarget:_movieWriter];
+    [self.blendFilter removeTarget:_cropFilter];
     _videoCamera.audioEncodingTarget = nil;
     [_movieWriter finishRecording];
     
@@ -673,6 +739,7 @@
     CGContextRef context=CGBitmapContextCreate(lumaBuffer, width, height, 8, bytesPerRow, grayColorSpace,0);
     CGImageRef cgImage = CGBitmapContextCreateImage(context);
     
+//    cgImage = CGImageCreateWithImageInRect(cgImage, CGRectMake(0, , , <#CGFloat height#>))
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
     
     IFlyFaceDirectionType faceOrientation=[self faceImageOrientation];
@@ -865,8 +932,9 @@
     BOOL isFrontCamera=self.videoCamera.inputCamera.position==AVCaptureDevicePositionFront;
     
     // scale coordinates so they fit in the preview box, which may be scaled
-    CGFloat widthScaleBy = self.filterView.frame.size.width / faceImg.height;
-    CGFloat heightScaleBy = self.filterView.frame.size.height / faceImg.width;
+    CGFloat width = self.view.gxWidth;
+    CGFloat widthScaleBy = width / faceImg.height;
+    CGFloat heightScaleBy = width/0.75 / faceImg.width;
     
     CGFloat bottom =[[positionDic objectForKey:KCIFlyFaceResultBottom] floatValue];
     CGFloat top=[[positionDic objectForKey:KCIFlyFaceResultTop] floatValue];
@@ -891,6 +959,10 @@
     
     rectFace=rScale(rectFace, widthScaleBy, heightScaleBy);
     
+//    if (_scale == 1) {
+//        rectFace = 
+//    }
+    
     return NSStringFromCGRect(rectFace);
     
 }
@@ -904,8 +976,9 @@
     BOOL isFrontCamera=self.videoCamera.inputCamera.position==AVCaptureDevicePositionFront;
     
     // scale coordinates so they fit in the preview box, which may be scaled
-    CGFloat widthScaleBy = self.filterView.frame.size.width / faceImg.height;
-    CGFloat heightScaleBy = self.filterView.frame.size.height / faceImg.width;
+    CGFloat width = self.view.gxWidth;
+    CGFloat widthScaleBy = width / faceImg.height;
+    CGFloat heightScaleBy = width/0.75 / faceImg.width;
     
     NSMutableDictionary *arrStrPoints = [NSMutableDictionary dictionary] ;
     NSEnumerator* keys=[landmarkDic keyEnumerator];
